@@ -1,0 +1,66 @@
+version: "3"
+services:
+  alluxio-master:
+    image: alluxio:latest
+    env_file: ./.env
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - "/dev/fuse:/dev/fuse"
+
+    restart: always
+    ports:
+      - "19998:19998"
+      - "19999:19999"
+    command: [ "master", "--no-format" ]
+    environment:
+      - ALLUXIO_MASTER_HOSTNAME=alluxio-master
+    volumes:
+      - "/mnt/ramdisk:/mnt/ramdisk"
+      - "/mnt/alluxio:/mnt/alluxio"
+      - "/mnt/ssd1:/mnt/ssd1"
+
+  alluxio-worker:
+    image: alluxio:latest
+    env_file: ./.env
+    depends_on: 
+      - "alluxio-master"
+
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - "/dev/fuse:/dev/fuse"
+
+    restart: always
+    command: worker
+    environment:
+      - ALLUXIO_MASTER_HOSTNAME=alluxio-master
+      - ALLUXIO_RAM_FOLDER=/mnt/ramdisk
+    volumes:
+      - "/mnt/ramdisk:/mnt/ramdisk"
+      - "/mnt/alluxio:/mnt/alluxio"
+      - "/mnt/ssd1:/mnt/ssd1"
+
+  alluxio-proxy:
+    image: alluxio:latest
+    env_file: ./.env
+    depends_on:
+      - "alluxio-master"
+      - "alluxio-worker"
+
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - "/dev/fuse:/dev/fuse"
+    
+    ports:
+      - "39999:39999"
+    restart: always
+    command: proxy
+    environment:
+      - ALLUXIO_MASTER_HOSTNAME=alluxio-master
+    volumes:
+      - "/mnt/ramdisk:/mnt/ramdisk"
+      - "/mnt/alluxio:/mnt/alluxio"
+      - "/mnt/ssd1:/mnt/ssd1"
+

@@ -49,6 +49,7 @@
 # Config properties set for Alluxio master, worker and shell. (Default: "")
 # E.g. "-Dalluxio.master.port=39999"
 ALLUXIO_JAVA_OPTS="
+-Dalluxio.underfs.address=${ALLUXIO_UNDERFS_ADDRESS}
 -Dlog4j.configuration=file:${CONF_DIR}/log4j.properties
 -Dfs.s3n.awsAccessKeyId=$AWS_ACCESS_KEY_ID
 -Dfs.s3n.awsSecretAccessKey=$AWS_SECRET_KEY
